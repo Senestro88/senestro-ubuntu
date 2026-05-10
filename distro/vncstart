@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# =============================================================================
+# senestro-ubuntu/distro/vncstart
+# Starts the TigerVNC server inside the Ubuntu proot container.
+# Run this as your Ubuntu user after `sudo bash gui.sh` completes.
+# Display :1, resolution 1440x720, color depth 24, no zlib compression.
+# =============================================================================
+dbus-launch vncserver -geometry 1440x720 -depth 24 -zliblevel 0 -name senestro-ubuntu -xstartup /usr/bin/xfce4-session
