@@ -20,6 +20,7 @@ banner() {
     printf "\033[33m    _  _ ___  _  _ _  _ ___ _  _    _  _ ____ ___  \033[0m\n"
     printf "\033[36m    |  | |__] |  | |\\ |  |  |  |    |\\/| |  | |  \\ \033[0m\n"
     printf "\033[32m    |__| |__] |__| | \\|  |  |__|    |  | |__| |__/ \033[0m\n"
+    echo
     printf "\033[32m Ubuntu GUI environment for Termux\033[0m\n"
     printf "\033[0m\n"
 }

@@ -39,6 +39,7 @@ banner() {
 		${C}    |  | |__] |  | |\ |  |  |  |    |\/| |  | |  \ 
 		${G}    |__| |__] |__| | \|  |  |__|    |  | |__| |__/ 
 	EOF
+	echo
 	echo -e "${G} Ubuntu GUI environment for Termux\n"
 }
 

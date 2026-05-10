@@ -21,8 +21,22 @@ banner() {
     printf "\033[33m    _  _ ___  _  _ _  _ ___ _  _    _  _ ____ ___  \033[0m\n"
     printf "\033[36m    |  | |__] |  | |\\ |  |  |  |    |\\/| |  | |  \\ \033[0m\n"
     printf "\033[32m    |__| |__] |__| | \\|  |  |__|    |  | |__| |__/ \033[0m\n"
+    echo
     printf "\033[32m Ubuntu GUI environment for Termux\033[0m\n"
     printf "\033[0m\n"
+}
+
+# -----------------------------------------------------------------------------
+# confirm: Ask the user to confirm before proceeding with removal
+# -----------------------------------------------------------------------------
+confirm() {
+    printf "${Y} [${W}!${Y}]${W} This will remove the Ubuntu installation and clean up Termux state.\n"
+    printf "${Y} [${W}?${Y}]${W} Are you sure you want to continue? [y/N] "
+    read -r answer
+    case "$answer" in
+        [yY][eE][sS]|[yY]) return 0 ;;
+        *) printf "${R} [${W}-${R}]${C} Aborted.\n"${W}; exit 0 ;;
+    esac
 }
 
 # -----------------------------------------------------------------------------
@@ -49,4 +63,5 @@ package() {
 
 # --- Main execution order ---
 banner
+confirm
 package
