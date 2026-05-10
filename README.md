@@ -8,71 +8,82 @@
 <p align="center">
 <img src="https://img.shields.io/badge/Written%20In-Bash-darkgreen?style=flat-square">
 <img src="https://img.shields.io/badge/Open%20Source-Yes-darkviolet?style=flat-square">
-<img src="https://img.shields.io/github/stars/senestro-ubuntu/senestro-ubuntu?style=flat-square">
-<img src="https://img.shields.io/github/issues/senestro-ubuntu/senestro-ubuntu?color=red&style=flat-square">
-<img src="https://img.shields.io/github/forks/senestro-ubuntu/senestro-ubuntu?color=teal&style=flat-square">
+<img src="https://img.shields.io/github/stars/modded-ubuntu/modded-ubuntu?style=flat-square">
+<img src="https://img.shields.io/github/issues/modded-ubuntu/modded-ubuntu?color=red&style=flat-square">
+<img src="https://img.shields.io/github/forks/modded-ubuntu/modded-ubuntu?color=teal&style=flat-square">
 </p>
 <p align="center"><b>Run Ubuntu GUI on your termux with much features.</b></p>
 
+> **⚠️ Modded Version Notice**
+> This is a modded version of [modded-ubuntu](https://github.com/modded-ubuntu/modded-ubuntu/tree/master).
+> All credits and thanks go to the original **modded-ubuntu** project and its contributors.
+
 ### Features
 
-- Fixed Audio Output
-- Lightweight {Requires at least 4GB Storage}
-- 2 Browsers (Chromium & Mozilla Firefox)
-- Supports Bangla Fonts
-- VLC Media Player and MPV media player
-- Visual Studio Code (buggy on arm )
-- Sublime Text Editor (only for arm64/aarch64)
-- Easy for Beginners
-- Comes with some cool themes.
+- Audio output support (fixed for Termux/proot environments)
+- Lightweight installation (requires at least 4 GB of available storage)
+- Choice of two browsers: Chromium and Mozilla Firefox
+- Bengali font support (fonts-beng / fonts-beng-extra)
+- Media players: VLC and MPV
+- Visual Studio Code (note: may exhibit instability on ARM devices)
+- Sublime Text Editor (supported on arm64/aarch64 only)
+- Beginner-friendly installation process
+- Pre-configured desktop themes and wallpapers
 
 ### Installation
-- Firstly install [Termux](https://termux.com) apk from [HERE](https://f-droid.org/repo/com.termux_118.apk)
-- Secondly Clone the Repository & Run the setup File
+
+**Step 1 — Install Termux**
+
+Download and install the [Termux](https://termux.com) application from [F-Droid](https://f-droid.org/repo/com.termux_118.apk).
+
+**Step 2 — Clone the repository and run the setup script**
 
   - `yes | pkg up`
   - `pkg install git wget -y`
-  - `git clone --depth=1 https://github.com/senestro-ubuntu/senestro-ubuntu.git`
+  - `git clone --depth=1 https://github.com/Senestro88/senestro-ubuntu.git`
   - `cd senestro-ubuntu`
   - `bash setup.sh`
 
-- Then Restart your Termux & Type the following commands
+**Step 3 — Create your Ubuntu user**
+
+Restart Termux, then run the following commands:
 
    - `ubuntu`
    - `bash user.sh`
 
-- Type your ubuntu root username. Must be lowercase & no space included.
+Enter a username when prompted. It must be lowercase with no spaces.
 
-- Then Again Restart your Termux & Type the following commands
+**Step 4 — Install the GUI**
+
+Restart Termux again, then run:
 
    - `ubuntu`
    - `sudo bash gui.sh`
 
-- **You have to note your VNC password !!**
+> **Important:** Make note of the VNC password displayed during this step — it is required to connect later.
 
-- Ubuntu image is now successfully installed .
+The Ubuntu image is now fully installed.
 
-  - Type `vncstart` to run Vncserver
-  - Type `vncstop` to stop Vncserver
+  - Run `vncstart` to start the VNC server.
+  - Run `vncstop` to stop the VNC server.
 
-- Install VNC VIEWER Apk on your Device. [Google Play Store](https://play.google.com/store/apps/details?id=com.realvnc.viewer.android&hl=en)
+**Step 5 — Connect via VNC Viewer**
 
-- Open VNC VIEWER & Click on + Button & Enter the Address `localhost:1` & Name anything you like
-- Set the Picture Quality to High for better Quality
-- Click on Connect & Input the Password 
-- Enjoy :D
+Install [VNC Viewer](https://play.google.com/store/apps/details?id=com.realvnc.viewer.android&hl=en) on your device.
 
-### NOTE :
+- Open VNC Viewer and tap the **+** button.
+- Enter the address `localhost:1` and assign any name to the connection.
+- Set the picture quality to **High** for the best experience.
+- Tap **Connect** and enter your VNC password when prompted.
 
-- **Type `ubuntu` to run Ubuntu CLI.**
-- **Type `vncstart` to run Vncserver**
-- **Type `vncstop` to stop Vncserver**
+### Quick Reference
 
-- **Type `bash remove.sh` to remove Ubuntu Modded Os**
-
-### Video Tutorial : 
-
-[![Watch the Tutorial](./distro/image1.jpg)](https://mega.nz/embed/QvIC1TLQ#3z27MRNPwANAg6JTtx1Ei8kDouOZsZgk00bg4TsJMNQ!1m)
+| Command | Description |
+|---|---|
+| `ubuntu` | Launch the Ubuntu CLI environment |
+| `vncstart` | Start the VNC server |
+| `vncstop` | Stop the VNC server |
+| `bash remove.sh` | Uninstall the Ubuntu environment |
 
 #
 ### Click to see the [Changelog](./CHANGELOG.md)

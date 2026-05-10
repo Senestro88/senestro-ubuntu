@@ -3,25 +3,24 @@
 ## [2.0.0] - 2023-01-20
 
 ### Added
-- Options to choose browser,IDE,media player (to reduce storage consumtion)
-- Optimized code
-- Better stability 
-- Breeze Hacked (cursor theme)
-- Kora Icon Theme 
-- Custom config (to customize the ui by default)
-- Some wallpaper
-- Nerd fonts
-- many more.
+- Optional selection of browser, IDE, and media player during setup (reduces storage consumption)
+- Code optimization and improved overall stability
+- Breeze Hacked cursor theme
+- Kora icon theme
+- Custom default configuration for an enhanced out-of-the-box desktop experience
+- Additional wallpapers
+- Nerd Fonts support
+- Various other improvements
 
 ### Changed
-- The installer UI (little bit)
-- Default wallpaper
-- Default font
-- Default theme
+- Revised installer interface
+- Updated default wallpaper
+- Updated default font
+- Updated default desktop theme
 
 ### Fixed
-- Firefox  (added new installer)
-- Repository error 
-- many many more.
+- Firefox installation (migrated to a new, reliable installer)
+- Package repository errors
+- Numerous additional bug fixes
 
 <!-- END -->

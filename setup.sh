@@ -28,9 +28,9 @@ banner() {
 		${Y}    _  _ ___  _  _ _  _ ___ _  _    _  _ ____ ___  
 		${C}    |  | |__] |  | |\ |  |  |  |    |\/| |  | |  \ 
 		${G}    |__| |__] |__| | \|  |  |__|    |  | |__| |__/ 
-
 	EOF
-	echo -e "${G}     A modded gui version of ubuntu for Termux\n\n"${W}
+	echo -e "${G} Ubuntu GUI environment for Termux"${W}
+	echo "\n\n"
 }
 
 # -----------------------------------------------------------------------------
@@ -43,12 +43,12 @@ package() {
 
 	# Request storage access if not already granted
 	[ ! -d '/data/data/com.termux/files/home/storage' ] && \
-		echo -e "${R} [${W}-${R}]${C} Setting up Storage.."${W} && \
+		echo -e "${R} [${W}-${R}]${C} Requesting storage access..."${W} && \
 		termux-setup-storage
 
 	if [[ $(command -v pulseaudio) && $(command -v proot-distro) ]]; then
 		# Both packages already present — skip install
-		echo -e "\n${R} [${W}-${R}]${G} Packages already installed."${W}
+		echo -e "\n${R} [${W}-${R}]${G} Required packages are already installed."${W}
 	else
 		# Upgrade existing packages first, then install missing ones
 		yes | pkg upgrade
@@ -67,12 +67,12 @@ package() {
 # Exits early (0) if already installed.
 # -----------------------------------------------------------------------------
 distro() {
-	echo -e "\n${R} [${W}-${R}]${C} Checking for Distro..."${W}
+	echo -e "\n${R} [${W}-${R}]${C} Checking for Ubuntu distribution..."${W}
 	termux-reload-settings
 
 	if [[ -d "$UBUNTU_DIR" ]]; then
 		# Already installed — nothing to do
-		echo -e "\n${R} [${W}-${R}]${G} Distro already installed."${W}
+		echo -e "\n${R} [${W}-${R}]${G} Ubuntu distribution is already installed."${W}
 		exit 0
 	else
 		proot-distro install ubuntu
@@ -81,9 +81,9 @@ distro() {
 
 	# Verify installation succeeded
 	if [[ -d "$UBUNTU_DIR" ]]; then
-		echo -e "\n${R} [${W}-${R}]${G} Installed Successfully !!"${W}
+		echo -e "\n${R} [${W}-${R}]${G} Ubuntu distribution installed successfully."${W}
 	else
-		echo -e "\n${R} [${W}-${R}]${G} Error Installing Distro !\n"${W}
+		echo -e "\n${R} [${W}-${R}]${G} An error occurred during distribution installation.\n"${W}
 		exit 1
 	fi
 }
@@ -94,7 +94,7 @@ distro() {
 # Note: module-aaudio-sink is Android-specific; it will be ignored on non-Android hosts.
 # -----------------------------------------------------------------------------
 sound() {
-	echo -e "\n${R} [${W}-${R}]${C} Fixing Sound Problem..."${W}
+	echo -e "\n${R} [${W}-${R}]${C} Configuring audio output..."${W}
 
 	# Create ~/.sound if it doesn't exist
 	[ ! -e "$HOME/.sound" ] && touch "$HOME/.sound"
@@ -137,7 +137,7 @@ setup_vnc() {
 	if [[ -d "$CURR_DIR/distro" ]] && [[ -e "$CURR_DIR/distro/vncstart" ]]; then
 		cp -f "$CURR_DIR/distro/vncstart" "$UBUNTU_DIR/usr/local/bin/vncstart"
 	else
-		downloader "$CURR_DIR/vncstart" "https://raw.githubusercontent.com/senestro-ubuntu/senestro-ubuntu/master/distro/vncstart"
+		downloader "$CURR_DIR/vncstart" "https://raw.githubusercontent.com/Senestro88/senestro-ubuntu/refs/heads/main/distro/vncstart"
 		mv -f "$CURR_DIR/vncstart" "$UBUNTU_DIR/usr/local/bin/vncstart"
 	fi
 
@@ -145,7 +145,7 @@ setup_vnc() {
 	if [[ -d "$CURR_DIR/distro" ]] && [[ -e "$CURR_DIR/distro/vncstop" ]]; then
 		cp -f "$CURR_DIR/distro/vncstop" "$UBUNTU_DIR/usr/local/bin/vncstop"
 	else
-		downloader "$CURR_DIR/vncstop" "https://raw.githubusercontent.com/senestro-ubuntu/senestro-ubuntu/master/distro/vncstop"
+		downloader "$CURR_DIR/vncstop" "https://raw.githubusercontent.com/Senestro88/senestro-ubuntu/refs/heads/main/distro/vncstop"
 		mv -f "$CURR_DIR/vncstop" "$UBUNTU_DIR/usr/local/bin/vncstop"
 	fi
 
@@ -160,13 +160,13 @@ setup_vnc() {
 # -----------------------------------------------------------------------------
 permission() {
 	banner
-	echo -e "${R} [${W}-${R}]${C} Setting up Environment..."${W}
+	echo -e "${R} [${W}-${R}]${C} Configuring the environment..."${W}
 
 	# Copy or download user.sh (user/GUI setup script run inside Ubuntu)
 	if [[ -d "$CURR_DIR/distro" ]] && [[ -e "$CURR_DIR/distro/user.sh" ]]; then
 		cp -f "$CURR_DIR/distro/user.sh" "$UBUNTU_DIR/root/user.sh"
 	else
-		downloader "$CURR_DIR/user.sh" "https://raw.githubusercontent.com/senestro-ubuntu/senestro-ubuntu/master/distro/user.sh"
+		downloader "$CURR_DIR/user.sh" "https://raw.githubusercontent.com/Senestro88/senestro-ubuntu/refs/heads/main/distro/user.sh"
 		mv -f "$CURR_DIR/user.sh" "$UBUNTU_DIR/root/user.sh"
 	fi
 	chmod +x "$UBUNTU_DIR/root/user.sh"
@@ -186,16 +186,16 @@ permission() {
 	if [[ -e "$PREFIX/bin/ubuntu" ]]; then
 		banner
 		cat <<- EOF
-			${R} [${W}-${R}]${G} Ubuntu-22.04 (CLI) is now Installed on your Termux
-			${R} [${W}-${R}]${G} Restart your Termux to Prevent Some Issues.
-			${R} [${W}-${R}]${G} Type ${C}ubuntu${G} to run Ubuntu CLI.
-			${R} [${W}-${R}]${G} If you Want to Use UBUNTU in GUI MODE then ,
-			${R} [${W}-${R}]${G} Run ${C}ubuntu${G} first & then type ${C}bash user.sh${W}
+			${R} [${W}-${R}]${G} Ubuntu 22.04 (CLI) has been successfully installed in Termux.
+			${R} [${W}-${R}]${G} Please restart Termux to ensure a clean environment.
+			${R} [${W}-${R}]${G} Run ${C}ubuntu${G} to launch the Ubuntu CLI.
+			${R} [${W}-${R}]${G} To set up the Ubuntu GUI, proceed as follows:
+			${R} [${W}-${R}]${G} Run ${C}ubuntu${G}, then execute ${C}bash user.sh${W}
 		EOF
 		# Sleep before exit so the user can read the message; exit 0 = success
 		{ echo; sleep 2; exit 0; }
 	else
-		echo -e "\n${R} [${W}-${R}]${G} Error Installing Distro !"${W}
+		echo -e "\n${R} [${W}-${R}]${G} An error occurred during distribution installation."${W}
 		exit 1
 	fi
 }

@@ -24,7 +24,7 @@ username=$(getent group sudo | awk -F ':' '{print $4}' | cut -d ',' -f1)
 # -----------------------------------------------------------------------------
 check_root() {
 	if [ "$(id -u)" -ne 0 ]; then
-		echo -ne " ${R}Run this program as root!\n\n"${W}
+		echo -ne " ${R}This script must be run as root. Please use: sudo bash gui.sh\n\n"${W}
 		exit 1
 	fi
 }
@@ -38,9 +38,8 @@ banner() {
 		${Y}    _  _ ___  _  _ _  _ ___ _  _    _  _ ____ ___  
 		${C}    |  | |__] |  | |\ |  |  |  |    |\/| |  | |  \ 
 		${G}    |__| |__] |__| | \|  |  |__|    |  | |__| |__/ 
-
 	EOF
-	echo -e "${G}     A modded gui version of ubuntu for Termux\n"
+	echo -e "${G} Ubuntu GUI environment for Termux\n"
 }
 
 # -----------------------------------------------------------------------------
@@ -48,23 +47,23 @@ banner() {
 # -----------------------------------------------------------------------------
 note() {
 	banner
-	echo -e " ${G} [-] Successfully Installed !\n"${W}
+	echo -e " ${G} [-] Installation completed successfully.\n"${W}
 	sleep 1
 	cat <<- EOF
-		 ${G}[-] Type ${C}vncstart${G} to run Vncserver.
-		 ${G}[-] Type ${C}vncstop${G} to stop Vncserver.
+		 ${G}[-] Run ${C}vncstart${G} to start the VNC server.
+		 ${G}[-] Run ${C}vncstop${G} to stop the VNC server.
 
-		 ${C}Install VNC VIEWER Apk on your Device.
+		 ${C}Install VNC Viewer on your Android device.
 
-		 ${C}Open VNC VIEWER & Click on + Button.
+		 ${C}Open VNC Viewer and tap the + button.
 
-		 ${C}Enter the Address localhost:1 & Name anything you like.
+		 ${C}Enter the address localhost:1 and assign any name to the connection.
 
-		 ${C}Set the Picture Quality to High for better Quality.
+		 ${C}Set the picture quality to High for the best visual experience.
 
-		 ${C}Click on Connect & Input the Password.
+		 ${C}Tap Connect and enter your VNC password when prompted.
 
-		 ${C}Enjoy :D${W}
+		 ${C}Your Ubuntu GUI is ready to use.${W}
 	EOF
 }
 
@@ -116,7 +115,7 @@ package() {
 install_apt() {
 	for apt in "$@"; do
 		[[ $(command -v "$apt") ]] && \
-			echo "${Y}${apt} is already Installed!${W}" || {
+			echo "${Y}${apt} is already installed.${W}" || {
 			echo -e "${G}Installing ${Y}${apt}${W}"
 			apt install -y "${apt}"
 		}
@@ -129,8 +128,8 @@ install_apt() {
 # Patches code.desktop to add --no-sandbox (required in proot containers).
 # -----------------------------------------------------------------------------
 install_vscode() {
-	[[ $(command -v code) ]] && echo "${Y}VSCode is already Installed!${W}" || {
-		echo -e "${G}Installing ${Y}VSCode${W}"
+	[[ $(command -v code) ]] && echo "${Y}Visual Studio Code is already installed.${W}" || {
+		echo -e "${G}Installing ${Y}Visual Studio Code${W}"
 
 		# Import Microsoft GPG key and add their apt repository
 		curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
@@ -141,10 +140,10 @@ install_vscode() {
 		apt install code -y
 
 		# Apply desktop entry patch to add --no-sandbox flag (required in proot)
-		echo "Patching.."
-		curl -fsSL https://raw.githubusercontent.com/senestro-ubuntu/senestro-ubuntu/master/patches/code.desktop \
+		echo "Applying desktop entry patch..."
+		curl -fsSL https://raw.githubusercontent.com/Senestro88/senestro-ubuntu/refs/heads/main/patches/code.desktop \
 			> /usr/share/applications/code.desktop
-		echo -e "${C} Visual Studio Code Installed Successfully\n${W}"
+		echo -e "${C} Visual Studio Code installed successfully.\n${W}"
 	}
 }
 
@@ -153,13 +152,13 @@ install_vscode() {
 # Recommended for arm64/aarch64 where VSCode may be unstable.
 # -----------------------------------------------------------------------------
 install_sublime() {
-	[[ $(command -v subl) ]] && echo "${Y}Sublime is already Installed!${W}" || {
+	[[ $(command -v subl) ]] && echo "${Y}Sublime Text is already installed.${W}" || {
 		apt install gnupg2 software-properties-common --no-install-recommends -y
 		echo "deb https://download.sublimetext.com/ apt/stable/" | tee /etc/apt/sources.list.d/sublime-text.list
 		curl -fsSL https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor > /etc/apt/trusted.gpg.d/sublime.gpg 2> /dev/null
 		apt update -y
 		apt install sublime-text -y
-		echo -e "${C} Sublime Text Editor Installed Successfully\n${W}"
+		echo -e "${C} Sublime Text Editor installed successfully.\n${W}"
 	}
 }
 
@@ -182,7 +181,7 @@ install_chromium() {
 		# Patch .desktop file to add --no-sandbox so Chromium works inside proot
 		sed -i 's/chromium %U/chromium --no-sandbox %U/g' /usr/share/applications/chromium.desktop 2>/dev/null
 		sed -i 's/chromium-browser %U/chromium-browser --no-sandbox %U/g' /usr/share/applications/chromium-browser.desktop 2>/dev/null
-		echo -e "${G} Chromium Installed Successfully\n${W}"
+		echo -e "${G} Chromium installed successfully.\n${W}"
 	}
 }
 
@@ -193,7 +192,7 @@ install_chromium() {
 install_firefox() {
 	[[ $(command -v firefox) ]] && echo "${Y}Firefox is already Installed!${W}\n" || {
 		echo -e "${G}Installing ${Y}Firefox${W}"
-		bash <(curl -fsSL "https://raw.githubusercontent.com/senestro-ubuntu/senestro-ubuntu/master/distro/firefox.sh")
+		bash <(curl -fsSL "https://raw.githubusercontent.com/Senestro88/senestro-ubuntu/refs/heads/main/distro/firefox.sh")
 		echo -e "${G} Firefox Installed Successfully\n${W}"
 	}
 }
@@ -264,7 +263,7 @@ install_softwares() {
 			install_sublime
 			install_vscode
 		else
-			echo -e "${Y} [!] Skipping IDE Installation\n"
+			echo -e "${Y} [!] Skipping IDE installation.\n"
 			sleep 1
 		fi
 	}
@@ -277,7 +276,7 @@ install_softwares() {
 	elif [[ ${PLAYER_OPTION} == 3 ]]; then
 		install_apt "mpv" "vlc"
 	else
-		echo -e "${Y} [!] Skipping Media Player Installation\n"
+		echo -e "${Y} [!] Skipping media player installation.\n"
 		sleep 1
 	fi
 }
@@ -365,14 +364,14 @@ config() {
 	temp_folder=$(mktemp -d -p "$HOME")
 	{ banner; sleep 1; cd "$temp_folder"; }
 
-	echo -e "${R} [${W}-${R}]${C} Downloading Required Files..\n"${W}
-	downloader "fonts.tar.gz"           "https://github.com/senestro-ubuntu/senestro-ubuntu/releases/download/config/fonts.tar.gz"
-	downloader "icons.tar.gz"           "https://github.com/senestro-ubuntu/senestro-ubuntu/releases/download/config/icons.tar.gz"
-	downloader "wallpaper.tar.gz"       "https://github.com/senestro-ubuntu/senestro-ubuntu/releases/download/config/wallpaper.tar.gz"
-	downloader "gtk-themes.tar.gz"      "https://github.com/senestro-ubuntu/senestro-ubuntu/releases/download/config/gtk-themes.tar.gz"
-	downloader "ubuntu-settings.tar.gz" "https://github.com/senestro-ubuntu/senestro-ubuntu/releases/download/config/ubuntu-settings.tar.gz"
+	echo -e "${R} [${W}-${R}]${C} Downloading required configuration files...\n"${W}
+	downloader "fonts.tar.gz"           "https://raw.githubusercontent.com/Senestro88/assets/refs/heads/main/senestro-ubuntu/fonts.tar.gz"
+	downloader "icons.tar.gz"           "https://raw.githubusercontent.com/Senestro88/assets/refs/heads/main/senestro-ubuntu/icons.tar.gz"
+	downloader "wallpaper.tar.gz"       "https://raw.githubusercontent.com/Senestro88/assets/refs/heads/main/senestro-ubuntu/wallpaper.tar.gz"
+	downloader "gtk-themes.tar.gz"      "https://raw.githubusercontent.com/Senestro88/assets/refs/heads/main/senestro-ubuntu/gtk-themes.tar.gz"
+	downloader "ubuntu-settings.tar.gz" "https://raw.githubusercontent.com/Senestro88/assets/refs/heads/main/senestro-ubuntu/ubuntu-settings.tar.gz"
 
-	echo -e "${R} [${W}-${R}]${C} Unpacking Files..\n"${W}
+	echo -e "${R} [${W}-${R}]${C} Extracting downloaded archives...\n"${W}
 	tar -xvzf fonts.tar.gz           -C "/usr/local/share/fonts/"
 	tar -xvzf icons.tar.gz           -C "/usr/share/icons/"
 	tar -xvzf wallpaper.tar.gz       -C "/usr/share/backgrounds/xfce/"
@@ -382,14 +381,14 @@ config() {
 	# Clean up temp download directory
 	rm -fr "$temp_folder"
 
-	echo -e "${R} [${W}-${R}]${C} Purging Unnecessary Files.."${W}
+	echo -e "${R} [${W}-${R}]${C} Removing unused themes and icons..."${W}
 	rem_theme
 	rem_icon
 
-	echo -e "${R} [${W}-${R}]${C} Rebuilding Font Cache..\n"${W}
+	echo -e "${R} [${W}-${R}]${C} Rebuilding the font cache...\n"${W}
 	fc-cache -fv
 
-	echo -e "${R} [${W}-${R}]${C} Upgrading the System..\n"${W}
+	echo -e "${R} [${W}-${R}]${C} Performing final system upgrade...\n"${W}
 	apt update
 	yes | apt upgrade
 	apt clean

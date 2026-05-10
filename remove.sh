@@ -21,8 +21,7 @@ banner() {
     printf "\033[33m    _  _ ___  _  _ _  _ ___ _  _    _  _ ____ ___  \033[0m\n"
     printf "\033[36m    |  | |__] |  | |\\ |  |  |  |    |\\/| |  | |  \\ \033[0m\n"
     printf "\033[32m    |__| |__] |__| | \\|  |  |__|    |  | |__| |__/ \033[0m\n"
-    printf "\033[0m\n"
-    printf "     \033[32mA modded gui version of ubuntu for Termux\033[0m\n"
+    printf "\033[32m Ubuntu GUI environment for Termux\033[0m\n"
     printf "\033[0m\n"
 }
 
@@ -31,7 +30,7 @@ banner() {
 # and clean up the PulseAudio sound lines written by setup.sh.
 # -----------------------------------------------------------------------------
 package() {
-    echo -e "${R} [${W}-${R}]${C} Purging packages..."${W}
+    echo -e "${R} [${W}-${R}]${C} Removing Ubuntu installation and cleaning up..."${W}
 
     # Remove Ubuntu proot image and its cached download
     proot-distro remove ubuntu && proot-distro clear-cache
@@ -45,7 +44,7 @@ package() {
     # Remove PulseAudio TCP module line from ~/.sound
     sed -i '/pacmd load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1/d' ~/.sound
 
-    echo -e "${R} [${W}-${R}]${C} Purging Completed !"${W}
+    echo -e "${R} [${W}-${R}]${C} Uninstallation completed successfully."${W}
 }
 
 # --- Main execution order ---
