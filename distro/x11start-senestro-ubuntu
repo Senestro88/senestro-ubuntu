@@ -34,12 +34,12 @@ rm -f /tmp/.X11-unix/X${DISPLAY_NUM}
 rmdir /tmp/.X11-unix 2>/dev/null
 
 # ── Fix D-Bus machine-id BEFORE entering proot ────────────────────────────
-ROOTFS_MACHINEID="$(proot-distro login ubuntu -- cat /etc/machine-id 2>/dev/null)"
+ROOTFS_MACHINEID="$(proot-distro login ubuntu --bind /sdcard:/sdcard -- cat /etc/machine-id 2>/dev/null)"
 if [ -z "$ROOTFS_MACHINEID" ] || [ ${#ROOTFS_MACHINEID} -ne 32 ]; then
     echo "Generating D-Bus machine-id..."
     NEW_UUID="$(cat /proc/sys/kernel/random/uuid 2>/dev/null | tr -d '-')"
     [ -z "$NEW_UUID" ] && NEW_UUID="$(dd if=/dev/urandom bs=16 count=1 2>/dev/null | od -An -tx1 | tr -d ' \n')"
-    proot-distro login ubuntu -- bash -c \
+    proot-distro login ubuntu --bind /sdcard:/sdcard -- bash -c \
         "echo '$NEW_UUID' > /etc/machine-id
          mkdir -p /var/lib/dbus
          echo '$NEW_UUID' > /var/lib/dbus/machine-id"
@@ -70,7 +70,7 @@ if ! command -v termux-x11 &>/dev/null; then
 fi
 
 # ── XFCE4 preflight check (inside Ubuntu) ─────────────────────────────────
-if ! proot-distro login ubuntu -- command -v startxfce4 &>/dev/null; then
+if ! proot-distro login ubuntu --bind /sdcard:/sdcard -- command -v startxfce4 &>/dev/null; then
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "  ERROR: XFCE4 is not installed inside Ubuntu."
@@ -106,6 +106,7 @@ proot-distro login ubuntu \
     --shared-tmp \
     --fix-low-ports \
     --bind /dev/null:/proc/sys/kernel/cap_last_last \
+    --bind /sdcard:/sdcard \
     -- env \
     DISPLAY=:${DISPLAY_NUM} \
     PULSE_SERVER=127.0.0.1 \

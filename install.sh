@@ -218,8 +218,13 @@ permission() {
 	# Mirror the host Android timezone into the Ubuntu container
 	echo "$(getprop persist.sys.timezone)" > "$UBUNTU_DIR/etc/timezone"
 
-	# Create the `senestro-ubuntu` shortcut command in Termux's PATH
-	echo "proot-distro login ubuntu" > "$PREFIX/bin/senestro-ubuntu"
+	# Create the /sdcard mountpoint inside the Ubuntu rootfs so proot-distro
+	# can bind /sdcard (Android shared storage) without a "no such file" error.
+	mkdir -p "$UBUNTU_DIR/sdcard"
+
+	# Create the `senestro-ubuntu` shortcut command in Termux's PATH.
+	# --bind /sdcard:/sdcard shares Android shared storage inside Ubuntu.
+	echo "proot-distro login ubuntu --bind /sdcard:/sdcard" > "$PREFIX/bin/senestro-ubuntu"
 	chmod +x "$PREFIX/bin/senestro-ubuntu"
 
 	termux-reload-settings

@@ -1,5 +1,15 @@
 ## Changelog
 
+## [2.1.7] - 11-MAY-2026
+
+### Added
+- `/sdcard` (Android shared storage) is now bound into Ubuntu at `/sdcard` across all proot-distro login calls:
+  - `install.sh` `permission()`: `mkdir -p "$UBUNTU_DIR/sdcard"` creates the mountpoint in the rootfs at install time so proot never errors on a missing target; the bootstrap `senestro-ubuntu` launcher now includes `--bind /sdcard:/sdcard`
+  - `user.sh` `login()`: the permanent `senestro-ubuntu` launcher written after user creation now includes `--bind /sdcard:/sdcard`
+  - `x11start-senestro-ubuntu`: all four `proot-distro login ubuntu` calls (machine-id read, machine-id write, XFCE4 preflight check, XFCE4 desktop launch) now include `--bind /sdcard:/sdcard`
+
+---
+
 ## [2.1.6] - 11-MAY-2026
 
 ### Added
