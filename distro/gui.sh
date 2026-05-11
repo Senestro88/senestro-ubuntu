@@ -351,8 +351,13 @@ config() {
 	banner
 	sound_fix
 
-	# Import a GPG key used by some packages during upgrade
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
+	# Import a GPG key used by some packages during upgrade.
+	# FIX: apt-key is deprecated and removed in Ubuntu 22.04+.
+	# Replaced with gpg --keyserver fetch written directly to /etc/apt/trusted.gpg.d/.
+	gpg --no-default-keyring \
+	    --keyring /etc/apt/trusted.gpg.d/ubuntu-archive-extra.gpg \
+	    --keyserver keyserver.ubuntu.com \
+	    --recv-keys 3B4FE6ACC0B21F32
 
 	yes | apt upgrade
 

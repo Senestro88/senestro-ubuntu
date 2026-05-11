@@ -70,7 +70,7 @@ if ! command -v termux-x11 &>/dev/null; then
 fi
 
 # ── XFCE4 preflight check (inside Ubuntu) ─────────────────────────────────
-if ! proot-distro login ubuntu -- command -v startxfce4 &>/dev/null; then
+if ! proot-distro login ubuntu --command -v startxfce4 &>/dev/null; then
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "  ERROR: XFCE4 is not installed inside Ubuntu."

@@ -1,5 +1,12 @@
 ## Changelog
 
+## [2.1.5] - 11-MAY-2026
+
+### Fixed
+- `gui.sh`: replaced deprecated `apt-key adv --keyserver ... --recv-keys` in `config()` with the modern `gpg --no-default-keyring --keyring /etc/apt/trusted.gpg.d/ubuntu-archive-extra.gpg --keyserver ... --recv-keys` equivalent. `apt-key` was removed in Ubuntu 22.04+ and caused a `command not found` error during setup.
+
+---
+
 ## [2.1.4] - 11-MAY-2026
 
 ### Fixed
