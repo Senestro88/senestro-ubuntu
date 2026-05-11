@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# =============================================================================
+# senestro-ubuntu/distro/x11stop-senestro-ubuntu
+# Stops the XFCE4 session and Termux-X11 server cleanly.
+# Run this in TERMUX (not inside Ubuntu).
+# =============================================================================
+
+echo "[x11stop-senestro-ubuntu] Stopping XFCE4 session inside Ubuntu..."
+
+# Ask the XFCE session manager to quit gracefully
+proot-distro login senestro-ubuntu \
+	--shared-tmp \
+	-- env DISPLAY=:0 xfce4-session-logout --logout --fast 2>/dev/null
+
+# Kill any remaining xfce4-session processes inside the proot container
+proot-distro login senestro-ubuntu \
+	--shared-tmp \
+	-- pkill -x xfce4-session 2>/dev/null
+
+echo "[x11stop-senestro-ubuntu] Stopping Termux-X11..."
+
+# Kill the termux-x11 server process running in Termux
+pkill -f "termux-x11 :0" 2>/dev/null
+
+# Clean up the X display lock and socket files so :0 can be reused
+rm -f /tmp/.X0-lock
+rm -f /tmp/.X11-unix/X0
+
+echo "[x11stop-senestro-ubuntu] Done. Termux-X11 session stopped."

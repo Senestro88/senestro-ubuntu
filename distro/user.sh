@@ -60,15 +60,15 @@ login() {
     # Grant passwordless sudo to this user
     echo "$user ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-    # Overwrite the Termux `ubuntu` launcher with a proper proot login command
+    # Overwrite the Termux `senestro-ubuntu` launcher with a proper proot login command
     # --bind /dev/null:/proc/sys/kernel/cap_last_last  : avoids capability read errors
     # --shared-tmp                                      : share /tmp with Termux
     # --fix-low-ports                                   : allow binding to ports <1024
     echo "proot-distro login --user $user ubuntu --bind /dev/null:/proc/sys/kernel/cap_last_last --shared-tmp --fix-low-ports" \
-        > /data/data/com.termux/files/usr/bin/ubuntu
+        > /data/data/com.termux/files/usr/bin/senestro-ubuntu
 
     # FIX: make the launcher executable (was commented out in original)
-    chmod +x /data/data/com.termux/files/usr/bin/ubuntu
+    chmod +x /data/data/com.termux/files/usr/bin/senestro-ubuntu
 
     # Copy or download gui.sh into the new user's home directory
     if [[ -e '/data/data/com.termux/files/home/senestro-ubuntu/distro/gui.sh' ]]; then
@@ -82,7 +82,7 @@ login() {
 
     clear
     echo
-    echo -e "\n${R} [${W}-${R}]${G} Restart Termux, then run ${C}ubuntu"${W}
+    echo -e "\n${R} [${W}-${R}]${G} Restart Termux, then run ${C}senestro-ubuntu"${W}
     echo -e "\n${R} [${W}-${R}]${G} Next, run ${C}sudo bash gui.sh"${W}
     echo
 }

@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# senestro-ubuntu/remove.sh
+# senestro-ubuntu/uninstall.sh
 # Removes the Ubuntu proot-distro installation and cleans up Termux state.
 # Run from Termux (NOT inside Ubuntu).
 # =============================================================================
@@ -41,7 +41,7 @@ confirm() {
 
 # -----------------------------------------------------------------------------
 # package: Remove the Ubuntu distro image, its cache, the `ubuntu` launcher,
-# and clean up the PulseAudio sound lines written by setup.sh.
+# and clean up the PulseAudio sound lines written by install.sh.
 # -----------------------------------------------------------------------------
 package() {
     echo -e "${R} [${W}-${R}]${C} Removing Ubuntu installation and cleaning up..."${W}

@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# senestro-ubuntu/setup.sh
+# senestro-ubuntu/install.sh
 # Main entry point. Run this in Termux to install Ubuntu via proot-distro.
 # Steps: install Termux packages → install Ubuntu distro → fix sound → setup env
 # =============================================================================
@@ -53,7 +53,7 @@ package() {
 	else
 		# Upgrade existing packages first, then install missing ones
 		yes | pkg upgrade
-		packs=(pulseaudio proot-distro)
+		packs=(pulseaudio proot-distro termux-x11-nightly)
 		for x in "${packs[@]}"; do
 			type -p "$x" &>/dev/null || {
 				echo -e "\n${R} [${W}-${R}]${G} Installing package : ${Y}$x${C}"${W}
@@ -156,6 +156,33 @@ setup_vnc() {
 }
 
 # -----------------------------------------------------------------------------
+# setup_x11: Copy or download x11start and x11stop launcher scripts.
+# These run in Termux (not inside Ubuntu) and use Termux-X11 instead of VNC.
+# Prefers local distro/ copies; falls back to downloading from GitHub.
+# -----------------------------------------------------------------------------
+setup_x11() {
+	# --- x11start-senestro-ubuntu ---
+	if [[ -d "$CURR_DIR/distro" ]] && [[ -e "$CURR_DIR/distro/x11start-senestro-ubuntu" ]]; then
+		cp -f "$CURR_DIR/distro/x11start-senestro-ubuntu" "$PREFIX/bin/x11start-senestro-ubuntu"
+	else
+		downloader "$CURR_DIR/x11start-senestro-ubuntu" "https://raw.githubusercontent.com/Senestro88/senestro-ubuntu/refs/heads/main/distro/x11start-senestro-ubuntu"
+		mv -f "$CURR_DIR/x11start-senestro-ubuntu" "$PREFIX/bin/x11start-senestro-ubuntu"
+	fi
+
+	# --- x11stop-senestro-ubuntu ---
+	if [[ -d "$CURR_DIR/distro" ]] && [[ -e "$CURR_DIR/distro/x11stop-senestro-ubuntu" ]]; then
+		cp -f "$CURR_DIR/distro/x11stop-senestro-ubuntu" "$PREFIX/bin/x11stop-senestro-ubuntu"
+	else
+		downloader "$CURR_DIR/x11stop-senestro-ubuntu" "https://raw.githubusercontent.com/Senestro88/senestro-ubuntu/refs/heads/main/distro/x11stop-senestro-ubuntu"
+		mv -f "$CURR_DIR/x11stop-senestro-ubuntu" "$PREFIX/bin/x11stop-senestro-ubuntu"
+	fi
+
+	# Make both scripts executable
+	chmod +x "$PREFIX/bin/x11start-senestro-ubuntu"
+	chmod +x "$PREFIX/bin/x11stop-senestro-ubuntu"
+}
+
+# -----------------------------------------------------------------------------
 # permission: Install user.sh inside Ubuntu, create the `ubuntu` launcher,
 # set timezone, and print final instructions.
 # -----------------------------------------------------------------------------
@@ -175,26 +202,29 @@ permission() {
 	# Set up VNC launcher scripts inside Ubuntu
 	setup_vnc
 
+	# Set up Termux-X11 launcher scripts in Termux PATH
+	setup_x11
+
 	# Mirror the host Android timezone into the Ubuntu container
 	echo "$(getprop persist.sys.timezone)" > "$UBUNTU_DIR/etc/timezone"
 
-	# Create the `ubuntu` shortcut command in Termux's PATH
-	echo "proot-distro login ubuntu" > "$PREFIX/bin/ubuntu"
-	chmod +x "$PREFIX/bin/ubuntu"
+	# Create the `senestro-ubuntu` shortcut command in Termux's PATH
+	echo "proot-distro login ubuntu" > "$PREFIX/bin/senestro-ubuntu"
+	chmod +x "$PREFIX/bin/senestro-ubuntu"
 
 	termux-reload-settings
 
-	if [[ -e "$PREFIX/bin/ubuntu" ]]; then
+	if [[ -e "$PREFIX/bin/senestro-ubuntu" ]]; then
 		banner
 		cat <<- EOF
 			${R} [${W}-${R}]${G} Ubuntu 22.04 (CLI) has been successfully installed in Termux.
 			${R} [${W}-${R}]${G} Please restart Termux to ensure a clean environment.
-			${R} [${W}-${R}]${G} Run ${C}ubuntu${G} to launch the Ubuntu CLI.
+			${R} [${W}-${R}]${G} Run ${C}senestro-ubuntu${G} to launch the Ubuntu CLI.
 			${R} [${W}-${R}]${G} To set up the Ubuntu GUI, proceed as follows:
-			${R} [${W}-${R}]${G} Run ${C}ubuntu${G}, then execute ${C}bash user.sh${W}
+			${R} [${W}-${R}]${G} Run ${C}senestro-ubuntu${G}, then execute ${C}bash user.sh${W}
 		EOF
 		# Sleep before exit so the user can read the message; exit 0 = success
-		{ echo; sleep 2; exit 0; }
+		{ echo; sleep 4; exit 0; }
 	else
 		echo -e "\n${R} [${W}-${R}]${G} An error occurred during distribution installation."${W}
 		exit 1

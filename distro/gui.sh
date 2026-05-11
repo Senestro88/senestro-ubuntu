@@ -21,7 +21,7 @@ username=$(getent group sudo | awk -F ':' '{print $4}' | cut -d ',' -f1)
 
 # -----------------------------------------------------------------------------
 # check_root: Abort if not running as root (required for apt and user installs)
-# -----------------------------------------------------------------------------
+2# -----------------------------------------------------------------------------
 check_root() {
 	if [ "$(id -u)" -ne 0 ]; then
 		echo -ne " ${R}This script must be run as root. Please use: sudo bash gui.sh\n\n"${W}
@@ -51,8 +51,9 @@ note() {
 	echo -e " ${G} [-] Installation completed successfully.\n"${W}
 	sleep 1
 	cat <<- EOF
-		 ${G}[-] Run ${C}vncstart${G} to start the VNC server.
-		 ${G}[-] Run ${C}vncstop${G} to stop the VNC server.
+		 ${G}[-] VNC Mode (TigerVNC):
+		 ${G}    Run ${C}vncstart${G} to start the VNC server.
+		 ${G}    Run ${C}vncstop${G} to stop the VNC server.
 
 		 ${C}Install VNC Viewer on your Android device.
 
@@ -63,6 +64,14 @@ note() {
 		 ${C}Set the picture quality to High for the best visual experience.
 
 		 ${C}Tap Connect and enter your VNC password when prompted.
+
+		 ${G}[-] Termux-X11 Mode (recommended — lower latency):
+		 ${G}    Exit Ubuntu, then run ${C}x11start${G} in Termux.
+		 ${G}    Run ${C}x11stop${G} in Termux to stop the session.
+
+		 ${C}Install the Termux-X11 companion app on your Android device.
+
+		 ${C}Run ${C}x11start${G} in Termux, then open the Termux-X11 app to view the desktop.
 
 		 ${C}Your Ubuntu GUI is ready to use.${W}
 	EOF
@@ -96,14 +105,10 @@ package() {
 		xfce4-terminal librsvg2-common menu inetutils-tools dialog exo-utils \
 		tigervnc-standalone-server tigervnc-common tigervnc-tools dbus-x11 \
 		fonts-beng fonts-beng-extra gtk2-engines-murrine gtk2-engines-pixbuf \
-		apt-transport-https)
+		apt-transport-https xorg-xserver-xephyr)
 
-	for hulu in "${packs[@]}"; do
-		type -p "$hulu" &>/dev/null || {
-			echo -e "\n${R} [${W}-${R}]${G} Installing package : ${Y}$hulu${W}"
-			apt-get install "$hulu" -y --no-install-recommends
-		}
-	done
+	echo -e "\n${R} [${W}-${R}]${G} Installing packages: ${Y}${packs[*]}${W}\n"
+	apt-get install -y --no-install-recommends "${packs[@]}"
 
 	apt-get update -y
 	apt-get upgrade -y
@@ -211,6 +216,7 @@ install_softwares() {
 		${C} [${W}1${C}] Firefox (Default)
 		${C} [${W}2${C}] Chromium
 		${C} [${W}3${C}] Both (Firefox + Chromium)
+		${C} [${W}4${C}] Skip! (Default)
 
 	EOF
 	read -n1 -p "${R} [${G}~${R}]${Y} Select an Option: ${G}" BROWSER_OPTION
@@ -250,6 +256,9 @@ install_softwares() {
 	elif [[ ${BROWSER_OPTION} == 3 ]]; then
 		install_firefox
 		install_chromium
+	elif [[ ${BROWSER_OPTION} == 4 ]]; then
+		echo -e "${Y} [!] Skipping browser installation.\n"
+		sleep 1
 	else
 		install_firefox   # Default: Firefox
 	fi
@@ -297,22 +306,15 @@ downloader() {
 }
 
 # -----------------------------------------------------------------------------
-# sound_fix: Wire PulseAudio sound from Termux into the Ubuntu session.
-# Prepends `bash ~/.sound` to the ubuntu launcher so sound starts on login.
-# Also exports DISPLAY and PULSE_SERVER for the X/VNC session.
+# sound_fix: Prepend `bash ~/.sound` to the ubuntu Termux launcher so that
+# PulseAudio forwarding is started when the container is entered.
+# DISPLAY and PULSE_SERVER are now set in vncstart/vncstop instead of
+# /etc/profile, to avoid PulseAudio warnings on every plain login.
 # -----------------------------------------------------------------------------
 sound_fix() {
 	# Prepend sound startup to the Termux `ubuntu` launcher
 	echo "$(echo "bash ~/.sound" | cat - /data/data/com.termux/files/usr/bin/ubuntu)" \
 		> /data/data/com.termux/files/usr/bin/ubuntu
-
-	# Set the VNC display environment variable for all sessions
-	echo 'export DISPLAY=":1"' >> /etc/profile
-
-	# Point PulseAudio client to the Termux TCP server
-	echo "export PULSE_SERVER=127.0.0.1" >> /etc/profile
-
-	source /etc/profile
 }
 
 # -----------------------------------------------------------------------------

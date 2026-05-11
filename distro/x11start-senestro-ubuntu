@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# =============================================================================
+# senestro-ubuntu/distro/x11start-senestro-ubuntu
+# Starts the Ubuntu XFCE4 desktop via Termux-X11 (no VNC needed).
+# Run this in TERMUX (not inside Ubuntu) after `sudo bash gui.sh` completes.
+#
+# Requirements (Termux side):
+#   pkg install termux-x11-nightly pulseaudio
+# Requirements (Ubuntu side):
+#   xorg-xserver-xephyr  (installed by gui.sh)
+#
+# Usage: x11start-senestro-ubuntu
+# =============================================================================
+
+export DISPLAY=":0"
+export PULSE_SERVER=127.0.0.1
+
+# -----------------------------------------------------------------------------
+# Start PulseAudio in Termux if not already running.
+# Loads the Android audio sink and exposes PulseAudio over TCP on localhost
+# so the Ubuntu session can reach it.
+# -----------------------------------------------------------------------------
+if ! pulseaudio --check 2>/dev/null; then
+	echo "[x11start-senestro-ubuntu] Starting PulseAudio..."
+	pulseaudio --start --exit-idle-time=-1
+	pacmd load-module module-aaudio-sink 2>/dev/null
+	pacmd load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1 2>/dev/null
+fi
+
+# -----------------------------------------------------------------------------
+# Launch Termux-X11 in the background.
+# termux-x11 opens the X display; the companion Android app renders it.
+# -----------------------------------------------------------------------------
+echo "[x11start-senestro-ubuntu] Starting Termux-X11 on display :0..."
+termux-x11 :0 &
+X11_PID=$!
+
+# Give the X server a moment to initialize before launching the desktop
+sleep 2
+
+# -----------------------------------------------------------------------------
+# Start XFCE4 session inside the Ubuntu proot container on display :0.
+# --shared-tmp lets the Ubuntu session see the X socket in Termux's /tmp.
+# --fix-low-ports allows binding to privileged ports if needed.
+# -----------------------------------------------------------------------------
+echo "[x11start-senestro-ubuntu] Launching XFCE4 inside Ubuntu..."
+proot-distro login senestro-ubuntu \
+	--shared-tmp \
+	--fix-low-ports \
+	--bind /dev/null:/proc/sys/kernel/cap_last_last \
+	-- env DISPLAY=:0 PULSE_SERVER=127.0.0.1 dbus-launch --exit-with-session xfce4-session &
+
+echo "[x11start-senestro-ubuntu] Desktop started. Open the Termux-X11 app on your device to view it."
+echo "[x11start-senestro-ubuntu] Run x11stop-senestro-ubuntu to end the session."

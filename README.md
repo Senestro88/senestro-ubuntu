@@ -29,6 +29,8 @@
 - Sublime Text Editor (supported on arm64/aarch64 only)
 - Beginner-friendly installation process
 - Pre-configured desktop themes and wallpapers
+- Termux-X11 support for low-latency native display (no VNC required)
+- VNC support via TigerVNC for remote desktop access
 
 ### Installation
 
@@ -42,13 +44,13 @@ Download and install the [Termux](https://termux.com) application from [F-Droid]
   - `pkg install git wget -y`
   - `git clone --depth=1 https://github.com/Senestro88/senestro-ubuntu.git`
   - `cd senestro-ubuntu`
-  - `bash setup.sh`
+  - `bash install.sh`
 
 **Step 3 — Create your Ubuntu user**
 
 Restart Termux, then run the following commands:
 
-   - `ubuntu`
+   - `senestro-ubuntu`
    - `bash user.sh`
 
 Enter a username when prompted. It must be lowercase with no spaces.
@@ -57,15 +59,20 @@ Enter a username when prompted. It must be lowercase with no spaces.
 
 Restart Termux again, then run:
 
-   - `ubuntu`
+   - `senestro-ubuntu`
    - `sudo bash gui.sh`
 
 > **Important:** Make note of the VNC password displayed during this step — it is required to connect later.
 
 The Ubuntu image is now fully installed.
 
+**VNC mode** (run inside `senestro-ubuntu`):
   - Run `vncstart` to start the VNC server.
   - Run `vncstop` to stop the VNC server.
+
+**Termux-X11 mode** (run in Termux, lower latency):
+  - Run `x11start-senestro-ubuntu` to start the desktop.
+  - Run `x11stop-senestro-ubuntu` to stop the desktop.
 
 **Step 5 — Connect via VNC Viewer**
 
@@ -78,12 +85,14 @@ Install [VNC Viewer](https://play.google.com/store/apps/details?id=com.realvnc.v
 
 ### Quick Reference
 
-| Command | Description |
-|---|---|
-| `ubuntu` | Launch the Ubuntu CLI environment |
-| `vncstart` | Start the VNC server |
-| `vncstop` | Stop the VNC server |
-| `bash remove.sh` | Uninstall the Ubuntu environment |
+| Command | Where | Description |
+|---|---|---|
+| `senestro-ubuntu` | Termux | Launch the Ubuntu CLI environment |
+| `x11start-senestro-ubuntu` | Termux | Start the desktop via Termux-X11 |
+| `x11stop-senestro-ubuntu` | Termux | Stop the Termux-X11 desktop session |
+| `vncstart` | Inside Ubuntu | Start the VNC server |
+| `vncstop` | Inside Ubuntu | Stop the VNC server |
+| `bash uninstall.sh` | Termux | Uninstall the Ubuntu environment |
 
 #
 ### Click to see the [Changelog](./CHANGELOG.md)
