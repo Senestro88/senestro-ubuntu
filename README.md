@@ -3,7 +3,7 @@
 </p>
 <p align="center">
 <img src="https://img.shields.io/badge/MADE%20IN-BANGLADESH-green?colorA=%23ff0000&colorB=%23017e40&style=for-the-badge">
-<img src="https://img.shields.io/badge/Version-2.1.8-blue?style=for-the-badge">
+<img src="https://img.shields.io/badge/Version-2.1.9-blue?style=for-the-badge">
 </p>
 <p align="center">
 <img src="https://img.shields.io/badge/Written%20In-Bash-darkgreen?style=flat-square">
@@ -22,11 +22,8 @@
 
 - Audio output support (fixed for Termux/proot environments)
 - Lightweight installation (requires at least 4 GB of available storage)
-- Choice of two browsers: Chromium and Mozilla Firefox
+- Optional media players: VLC and MPV
 - Bengali font support (fonts-beng / fonts-beng-extra)
-- Media players: VLC and MPV
-- Visual Studio Code (note: may exhibit instability on ARM devices)
-- Sublime Text Editor (supported on arm64/aarch64 only)
 - Beginner-friendly installation process
 - Pre-configured desktop themes and wallpapers
 - Termux-X11 support for low-latency native display
@@ -61,12 +58,21 @@ Restart Termux again, then run:
    - `senestro-ubuntu`
    - `sudo bash gui.sh`
 
-The Ubuntu image is now fully installed.
+The Ubuntu image is now fully installed. During `gui.sh` you will be prompted to optionally install a media player (MPV or VLC).
 
 **Termux-X11 mode** (run in Termux):
   - Install the [Termux-X11 companion APK](https://github.com/termux/termux-x11/releases) on your device.
   - Open the Termux-X11 app first, then run `x11start-senestro-ubuntu` in Termux.
   - Run `x11stop-senestro-ubuntu` in Termux to stop the desktop.
+
+### Uninstallation
+
+Run `bash uninstall.sh` from Termux. The script will:
+1. Confirm before removing anything.
+2. Remove the Ubuntu proot rootfs.
+3. Ask whether to also clear the proot-distro **download cache** — keeping it lets a future reinstall skip the Ubuntu tarball download; clearing it frees the disk space.
+4. Remove the `senestro-ubuntu`, `x11start-senestro-ubuntu`, and `x11stop-senestro-ubuntu` scripts from Termux PATH.
+5. Clean up PulseAudio lines from `~/.sound`.
 
 ### Quick Reference
 
@@ -100,4 +106,3 @@ Termux Proot Distro - https://github.com/termux/proot-distro
 
 
 ### If you like our work then dont forget to give a Star :)
-

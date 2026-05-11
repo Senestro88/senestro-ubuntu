@@ -2,8 +2,8 @@
 # =============================================================================
 # senestro-ubuntu/distro/gui.sh
 # Run INSIDE Ubuntu as the sudo user: `sudo bash gui.sh`
-# Installs XFCE4 desktop, optional browsers, IDEs, media players,
-# themes, fonts, wallpapers, and configures PulseAudio sound forwarding.
+# Installs XFCE4 desktop, media players, themes, fonts, wallpapers,
+# and configures PulseAudio sound forwarding.
 # =============================================================================
 
 # ANSI color codes
@@ -21,7 +21,7 @@ username=$(getent group sudo | awk -F ':' '{print $4}' | cut -d ',' -f1)
 
 # -----------------------------------------------------------------------------
 # check_root: Abort if not running as root (required for apt and user installs)
-2# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 check_root() {
 	if [ "$(id -u)" -ne 0 ]; then
 		echo -ne " ${R}This script must be run as root. Please use: sudo bash gui.sh\n\n"${W}
@@ -113,115 +113,10 @@ install_apt() {
 }
 
 # -----------------------------------------------------------------------------
-# install_vscode: Add Microsoft's apt repo and install Visual Studio Code.
-# Note: VSCode is x86_64 / arm64 / armhf only — may be buggy on some ARM builds.
-# Patches code.desktop to add --no-sandbox (required in proot containers).
+# install_media: Interactive menu to select and install a media player.
 # -----------------------------------------------------------------------------
-install_vscode() {
-	[[ $(command -v code) ]] && echo "${Y}Visual Studio Code is already installed.${W}" || {
-		echo -e "${G}Installing ${Y}Visual Studio Code${W}"
-
-		# Import Microsoft GPG key and add their apt repository
-		curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-		install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
-		echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" \
-			> /etc/apt/sources.list.d/vscode.list
-		apt update -y
-		apt install code -y
-
-		# Apply desktop entry patch to add --no-sandbox flag (required in proot)
-		echo "Applying desktop entry patch..."
-		curl -fsSL https://raw.githubusercontent.com/Senestro88/senestro-ubuntu/refs/heads/main/patches/code.desktop \
-			> /usr/share/applications/code.desktop
-		echo -e "${C} Visual Studio Code installed successfully.\n${W}"
-	}
-}
-
-# -----------------------------------------------------------------------------
-# install_sublime: Add Sublime Text's apt repo and install Sublime Text.
-# Recommended for arm64/aarch64 where VSCode may be unstable.
-# -----------------------------------------------------------------------------
-install_sublime() {
-	[[ $(command -v subl) ]] && echo "${Y}Sublime Text is already installed.${W}" || {
-		apt install gnupg2 software-properties-common --no-install-recommends -y
-		echo "deb https://download.sublimetext.com/ apt/stable/" | tee /etc/apt/sources.list.d/sublime-text.list
-		curl -fsSL https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor > /etc/apt/trusted.gpg.d/sublime.gpg 2> /dev/null
-		apt update -y
-		apt install sublime-text -y
-		echo -e "${C} Sublime Text Editor installed successfully.\n${W}"
-	}
-}
-
-# -----------------------------------------------------------------------------
-# install_chromium: Install Chromium browser.
-# Uses the standard Ubuntu apt repository (chromium package).
-# Patches the .desktop entry to add --no-sandbox (required in proot/non-root).
-# NOTE: Removed deprecated Debian buster repo and deprecated apt-key usage.
-# -----------------------------------------------------------------------------
-install_chromium() {
-	[[ $(command -v chromium) ]] && echo "${Y}Chromium is already Installed!${W}\n" || {
-		echo -e "${G}Installing ${Y}Chromium${W}"
-
-		# Remove any conflicting snap-managed chromium packages
-		apt purge chromium* chromium-browser* snapd -y
-
-		apt-get update -y
-		apt install chromium-browser -y
-
-		# Patch .desktop file to add --no-sandbox so Chromium works inside proot
-		sed -i 's/chromium %U/chromium --no-sandbox %U/g' /usr/share/applications/chromium.desktop 2>/dev/null
-		sed -i 's/chromium-browser %U/chromium-browser --no-sandbox %U/g' /usr/share/applications/chromium-browser.desktop 2>/dev/null
-		echo -e "${G} Chromium installed successfully.\n${W}"
-	}
-}
-
-# -----------------------------------------------------------------------------
-# install_firefox: Install Firefox via the Mozilla Team PPA.
-# Delegates to firefox.sh which handles PPA setup and key import.
-# -----------------------------------------------------------------------------
-install_firefox() {
-	[[ $(command -v firefox) ]] && echo "${Y}Firefox is already Installed!${W}\n" || {
-		echo -e "${G}Installing ${Y}Firefox${W}"
-		bash <(curl -fsSL "https://raw.githubusercontent.com/Senestro88/senestro-ubuntu/refs/heads/main/distro/firefox.sh")
-		echo -e "${G} Firefox Installed Successfully\n${W}"
-	}
-}
-
-# -----------------------------------------------------------------------------
-# install_softwares: Interactive menu to select browser, IDE, and media player.
-# FIX: arch check condition changed from || (always true) to && (correct logic).
-#      With ||, the IDE menu showed even on armhf/armv7 — now correctly hidden.
-# -----------------------------------------------------------------------------
-install_softwares() {
+install_media() {
 	banner
-	cat <<- EOF
-		${Y} ---${G} Select Browser ${Y}---
-
-		${C} [${W}1${C}] Firefox (Default)
-		${C} [${W}2${C}] Chromium
-		${C} [${W}3${C}] Both (Firefox + Chromium)
-		${C} [${W}4${C}] Skip! (Default)
-
-	EOF
-	read -n1 -p "${R} [${G}~${R}]${Y} Select an Option: ${G}" BROWSER_OPTION
-	banner
-
-	# Only show IDE options on 64-bit architectures (armhf/armv7 not supported)
-	# FIX: was [[ ... || ... ]] which is always true; corrected to [[ ... && ... ]]
-	[[ ("$arch" != 'armhf') && ("$arch" != *'armv7'*) ]] && {
-		cat <<- EOF
-			${Y} ---${G} Select IDE ${Y}---
-
-			${C} [${W}1${C}] Sublime Text Editor (Recommended)
-			${C} [${W}2${C}] Visual Studio Code
-			${C} [${W}3${C}] Both (Sublime + VSCode)
-			${C} [${W}4${C}] Skip! (Default)
-
-		EOF
-		read -n1 -p "${R} [${G}~${R}]${Y} Select an Option: ${G}" IDE_OPTION
-		banner
-	}
-
 	cat <<- EOF
 		${Y} ---${G} Media Player ${Y}---
 
@@ -233,34 +128,6 @@ install_softwares() {
 	EOF
 	read -n1 -p "${R} [${G}~${R}]${Y} Select an Option: ${G}" PLAYER_OPTION
 	{ banner; sleep 1; }
-
-	# Install selected browser
-	if [[ ${BROWSER_OPTION} == 2 ]]; then
-		install_chromium
-	elif [[ ${BROWSER_OPTION} == 3 ]]; then
-		install_firefox
-		install_chromium
-	elif [[ ${BROWSER_OPTION} == 4 ]]; then
-		echo -e "${Y} [!] Skipping browser installation.\n"
-		sleep 1
-	else
-		install_firefox   # Default: Firefox
-	fi
-
-	# Install selected IDE (only on supported architectures)
-	[[ ("$arch" != 'armhf') && ("$arch" != *'armv7'*) ]] && {
-		if [[ ${IDE_OPTION} == 1 ]]; then
-			install_sublime
-		elif [[ ${IDE_OPTION} == 2 ]]; then
-			install_vscode
-		elif [[ ${IDE_OPTION} == 3 ]]; then
-			install_sublime
-			install_vscode
-		else
-			echo -e "${Y} [!] Skipping IDE installation.\n"
-			sleep 1
-		fi
-	}
 
 	# Install selected media player
 	if [[ ${PLAYER_OPTION} == 1 ]]; then
@@ -390,6 +257,6 @@ config() {
 # --- Main execution order ---
 check_root
 package
-install_softwares
+install_media
 config
 note

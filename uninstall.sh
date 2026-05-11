@@ -40,15 +40,41 @@ confirm() {
 }
 
 # -----------------------------------------------------------------------------
-# package: Remove the Ubuntu distro image, its cache, the `senestro-ubuntu`
-# launcher, the x11 scripts, and clean up the PulseAudio sound lines
-# written by install.sh.
+# ask_clear_cache: After removing the Ubuntu rootfs, ask whether to also wipe
+# the proot-distro download cache. Keeping it means a reinstall can skip the
+# Ubuntu tarball download; clearing it frees the disk space.
+# -----------------------------------------------------------------------------
+ask_clear_cache() {
+    echo
+    printf "${Y} [${W}?${Y}]${W} Do you want to clear the proot-distro download cache?\n"
+    printf "${C}    Keeping it allows a future reinstall to reuse the already-downloaded Ubuntu tarball.\n"
+    printf "${C}    Clearing it frees the disk space but the tarball will be re-downloaded on next install.\n"
+    printf "${Y} [${W}?${Y}]${W} Clear cache? [y/N] "
+    read -r cache_answer
+    case "$cache_answer" in
+        [yY][eE][sS]|[yY])
+            echo -e "${R} [${W}-${R}]${C} Clearing proot-distro cache..."${W}
+            proot-distro clear-cache
+            echo -e "${G} [${W}-${G}]${C} Cache cleared."${W}
+            ;;
+        *)
+            echo -e "${Y} [!] Keeping proot-distro cache. A future reinstall will reuse it."${W}
+            ;;
+    esac
+}
+
+# -----------------------------------------------------------------------------
+# package: Remove the Ubuntu distro image, the `senestro-ubuntu` launcher,
+# the x11 scripts, and clean up the PulseAudio sound lines written by install.sh.
 # -----------------------------------------------------------------------------
 package() {
     echo -e "${R} [${W}-${R}]${C} Removing Ubuntu installation and cleaning up..."${W}
 
-    # Remove Ubuntu proot image and its cached download
-    proot-distro remove ubuntu && proot-distro clear-cache
+    # Remove the Ubuntu proot rootfs (does NOT clear the download cache)
+    proot-distro remove ubuntu
+
+    # Ask separately whether to wipe the cached Ubuntu tarball
+    ask_clear_cache
 
     # Remove Termux launcher and x11 scripts from Termux PATH
     rm -f "$PREFIX/bin/senestro-ubuntu"
