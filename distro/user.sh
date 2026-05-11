@@ -38,6 +38,45 @@ sudo_setup() {
 }
 
 # -----------------------------------------------------------------------------
+# install_desktop: Install XFCE4 as root so Termux-X11 can launch the desktop
+# without needing a sudo user. This runs before user creation intentionally —
+# x11start-senestro-ubuntu logs in as root (proot-distro login ubuntu, no
+# --user flag), so XFCE4 must be present at the root level.
+# -----------------------------------------------------------------------------
+install_desktop() {
+    banner
+    echo -e "\n${R} [${W}-${R}]${C} Installing XFCE4 desktop (required for Termux-X11)..."${W}
+    apt update -y
+    apt install -y --no-install-recommends xfce4 xfce4-goodies dbus-x11
+    echo -e "\n${R} [${W}-${R}]${G} XFCE4 installed successfully."${W}
+}
+
+# -----------------------------------------------------------------------------
+# set_root_password: Prompt the user to set a password for the root account.
+# Required so that su/sudo operations work correctly inside the container and
+# so the root desktop session is protected.
+# -----------------------------------------------------------------------------
+set_root_password() {
+    banner
+    echo -e "\n${R} [${W}-${R}]${C} Set a password for the root (su) account."${W}
+    echo -e " ${Y} This is used for su/sudo inside Ubuntu.\n"${W}
+
+    while true; do
+        read -s -p $' \e[1;31m[\e[0m\e[1;77m~\e[0m\e[1;31m]\e[0m\e[1;92m Enter root password: \e[0m\e[1;96m' root_pass
+        echo
+        read -s -p $' \e[1;31m[\e[0m\e[1;77m~\e[0m\e[1;31m]\e[0m\e[1;92m Confirm root password: \e[0m\e[1;96m' root_pass2
+        echo -e "${W}"
+        if [[ "$root_pass" == "$root_pass2" ]]; then
+            echo "root:${root_pass}" | chpasswd
+            echo -e "\n${R} [${W}-${R}]${G} Root password set successfully."${W}
+            break
+        else
+            echo -e "\n${Y} [!] Passwords do not match. Please try again.\n"${W}
+        fi
+    done
+}
+
+# -----------------------------------------------------------------------------
 # login: Prompt for a username and password, create the user with sudo rights,
 # write the proot login command to the Termux `ubuntu` launcher, and install gui.sh.
 # -----------------------------------------------------------------------------
@@ -48,8 +87,8 @@ login() {
     read -p $' \e[1;31m[\e[0m\e[1;77m~\e[0m\e[1;31m]\e[0m\e[1;92m Enter a username (lowercase, no spaces): \e[0m\e[1;96m\en' user
     echo -e "${W}"
 
-    # Read password
-    read -p $' \e[1;31m[\e[0m\e[1;77m~\e[0m\e[1;31m]\e[0m\e[1;92m Enter a password: \e[0m\e[1;96m\en' pass
+    # Read password (hidden input)
+    read -s -p $' \e[1;31m[\e[0m\e[1;77m~\e[0m\e[1;31m]\e[0m\e[1;92m Enter a password: \e[0m\e[1;96m' pass
     echo -e "${W}"
 
     # Create user with bash as default shell and add to sudo group
@@ -96,4 +135,6 @@ login() {
 # --- Main execution order ---
 banner
 sudo_setup
+install_desktop
+set_root_password
 login

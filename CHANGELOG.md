@@ -1,5 +1,17 @@
 ## Changelog
 
+## [2.1.6] - 11-MAY-2026
+
+### Added
+- `user.sh`: new `install_desktop()` function — installs `xfce4`, `xfce4-goodies`, and `dbus-x11` as root before user creation. Required because `x11start-senestro-ubuntu` logs into Ubuntu as root (`proot-distro login ubuntu`, no `--user` flag), so XFCE4 must be present at root level independently of `gui.sh`.
+- `user.sh`: new `set_root_password()` function — prompts for the root account password (with confirmation loop) and applies it via `chpasswd` before the sudo user is created. Ensures `su`/`sudo` work correctly inside the container from the first login.
+
+### Changed
+- `user.sh`: user password prompt in `login()` now uses `read -s` (hidden input) instead of plain `read`, consistent with the new root password prompt.
+- `user.sh`: main execution order updated to `sudo_setup → install_desktop → set_root_password → login`.
+
+---
+
 ## [2.1.5] - 11-MAY-2026
 
 ### Fixed
