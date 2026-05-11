@@ -2,7 +2,7 @@
 # =============================================================================
 # senestro-ubuntu/distro/gui.sh
 # Run INSIDE Ubuntu as the sudo user: `sudo bash gui.sh`
-# Installs XFCE4 desktop, TigerVNC, optional browsers, IDEs, media players,
+# Installs XFCE4 desktop, optional browsers, IDEs, media players,
 # themes, fonts, wallpapers, and configures PulseAudio sound forwarding.
 # =============================================================================
 
@@ -44,28 +44,14 @@ banner() {
 }
 
 # -----------------------------------------------------------------------------
-# note: Print post-install instructions for connecting via VNC Viewer
+# note: Print post-install instructions for starting the desktop
 # -----------------------------------------------------------------------------
 note() {
 	banner
 	echo -e " ${G} [-] Installation completed successfully.\n"${W}
 	sleep 1
 	cat <<- EOF
-		 ${G}[-] VNC Mode (TigerVNC):
-		 ${G}    Run ${C}vncstart${G} inside senestro-ubuntu to start the VNC server.
-		 ${G}    Run ${C}vncstop${G} inside senestro-ubuntu to stop the VNC server.
-
-		 ${C}Install VNC Viewer on your Android device.
-
-		 ${C}Open VNC Viewer and tap the + button.
-
-		 ${C}Enter the address localhost:1 and assign any name to the connection.
-
-		 ${C}Set the picture quality to High for the best visual experience.
-
-		 ${C}Tap Connect and enter your VNC password when prompted.
-
-		 ${G}[-] Termux-X11 Mode (recommended — lower latency):
+		 ${G}[-] Termux-X11 Mode:
 		 ${G}    Exit Ubuntu, then run ${C}x11start-senestro-ubuntu${G} in Termux.
 		 ${G}    Run ${C}x11stop-senestro-ubuntu${G} in Termux to stop the session.
 
@@ -95,16 +81,14 @@ package() {
 	dpkg --configure -a                            # Finish pending configurations
 	apt-mark hold udisks2                          # Prevent future postinst re-runs
 
-	# Core desktop + VNC packages
+	# Core desktop packages
 	# - xfce4 / xfce4-goodies: lightweight desktop environment
-	# - tigervnc-*: VNC server for remote GUI access
 	# - fonts-beng / fonts-beng-extra: Bengali font support
 	# - at-spi2-core: accessibility infrastructure (required by some XFCE components)
 	# - apt-transport-https: allows apt to use HTTPS sources
 	packs=(sudo gnupg2 curl nano git xz-utils at-spi2-core xfce4 xfce4-goodies \
 		xfce4-terminal librsvg2-common menu inetutils-tools dialog exo-utils \
-		tigervnc-standalone-server tigervnc-common tigervnc-tools dbus-x11 \
-		fonts-beng fonts-beng-extra gtk2-engines-murrine gtk2-engines-pixbuf \
+		dbus-x11 fonts-beng fonts-beng-extra gtk2-engines-murrine gtk2-engines-pixbuf \
 		apt-transport-https xorg-xserver-xephyr)
 
 	echo -e "\n${R} [${W}-${R}]${G} Installing packages: ${Y}${packs[*]}${W}\n"
@@ -308,7 +292,7 @@ downloader() {
 # -----------------------------------------------------------------------------
 # sound_fix: Prepend `bash ~/.sound` to the ubuntu Termux launcher so that
 # PulseAudio forwarding is started when the container is entered.
-# DISPLAY and PULSE_SERVER are now set in vncstart/vncstop instead of
+# DISPLAY and PULSE_SERVER are set only in x11start-senestro-ubuntu, not in
 # /etc/profile, to avoid PulseAudio warnings on every plain login.
 # -----------------------------------------------------------------------------
 sound_fix() {

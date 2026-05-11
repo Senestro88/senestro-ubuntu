@@ -116,7 +116,7 @@ sound() {
 	# Start PulseAudio as a daemon that never exits on idle
 	echo "pulseaudio --start --exit-idle-time=-1" >> "$HOME/.sound"
 
-	# Expose PulseAudio over TCP on localhost for the VNC session
+	# Expose PulseAudio over TCP on localhost for the X11 session
 	echo "pacmd load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" >> "$HOME/.sound"
 }
 
@@ -140,34 +140,8 @@ downloader() {
 }
 
 # -----------------------------------------------------------------------------
-# setup_vnc: Copy or download vncstart and vncstop launcher scripts.
-# Prefers local distro/ copies; falls back to downloading from GitHub.
-# -----------------------------------------------------------------------------
-setup_vnc() {
-	# --- vncstart ---
-	if [[ -d "$CURR_DIR/distro" ]] && [[ -e "$CURR_DIR/distro/vncstart" ]]; then
-		cp -f "$CURR_DIR/distro/vncstart" "$UBUNTU_DIR/usr/local/bin/vncstart"
-	else
-		downloader "$CURR_DIR/vncstart" "https://raw.githubusercontent.com/Senestro88/senestro-ubuntu/refs/heads/main/distro/vncstart"
-		mv -f "$CURR_DIR/vncstart" "$UBUNTU_DIR/usr/local/bin/vncstart"
-	fi
-
-	# --- vncstop ---
-	if [[ -d "$CURR_DIR/distro" ]] && [[ -e "$CURR_DIR/distro/vncstop" ]]; then
-		cp -f "$CURR_DIR/distro/vncstop" "$UBUNTU_DIR/usr/local/bin/vncstop"
-	else
-		downloader "$CURR_DIR/vncstop" "https://raw.githubusercontent.com/Senestro88/senestro-ubuntu/refs/heads/main/distro/vncstop"
-		mv -f "$CURR_DIR/vncstop" "$UBUNTU_DIR/usr/local/bin/vncstop"
-	fi
-
-	# Make both scripts executable
-	chmod +x "$UBUNTU_DIR/usr/local/bin/vncstart"
-	chmod +x "$UBUNTU_DIR/usr/local/bin/vncstop"
-}
-
-# -----------------------------------------------------------------------------
 # setup_x11: Copy or download x11start and x11stop launcher scripts.
-# These run in Termux (not inside Ubuntu) and use Termux-X11 instead of VNC.
+# These run in Termux (not inside Ubuntu) and use Termux-X11 for the desktop.
 # Prefers local distro/ copies; falls back to downloading from GitHub.
 # -----------------------------------------------------------------------------
 setup_x11() {
@@ -208,9 +182,6 @@ permission() {
 		mv -f "$CURR_DIR/user.sh" "$UBUNTU_DIR/root/user.sh"
 	fi
 	chmod +x "$UBUNTU_DIR/root/user.sh"
-
-	# Set up VNC launcher scripts inside Ubuntu
-	setup_vnc
 
 	# Set up Termux-X11 launcher scripts in Termux PATH
 	setup_x11

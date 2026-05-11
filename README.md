@@ -3,7 +3,7 @@
 </p>
 <p align="center">
 <img src="https://img.shields.io/badge/MADE%20IN-BANGLADESH-green?colorA=%23ff0000&colorB=%23017e40&style=for-the-badge">
-<img src="https://img.shields.io/badge/Version-2.1.1-blue?style=for-the-badge">
+<img src="https://img.shields.io/badge/Version-2.1.8-blue?style=for-the-badge">
 </p>
 <p align="center">
 <img src="https://img.shields.io/badge/Written%20In-Bash-darkgreen?style=flat-square">
@@ -29,8 +29,7 @@
 - Sublime Text Editor (supported on arm64/aarch64 only)
 - Beginner-friendly installation process
 - Pre-configured desktop themes and wallpapers
-- Termux-X11 support for low-latency native display (no VNC required)
-- VNC support via TigerVNC for remote desktop access
+- Termux-X11 support for low-latency native display
 
 ### Installation
 
@@ -62,27 +61,12 @@ Restart Termux again, then run:
    - `senestro-ubuntu`
    - `sudo bash gui.sh`
 
-> **Important:** Make note of the VNC password displayed during this step — it is required if you use VNC mode to connect later.
-
 The Ubuntu image is now fully installed.
 
-**VNC mode** (run inside `senestro-ubuntu`):
-  - Run `vncstart` to start the VNC server.
-  - Run `vncstop` to stop the VNC server.
-
-**Termux-X11 mode** (recommended — lower latency, run in Termux):
+**Termux-X11 mode** (run in Termux):
   - Install the [Termux-X11 companion APK](https://github.com/termux/termux-x11/releases) on your device.
   - Open the Termux-X11 app first, then run `x11start-senestro-ubuntu` in Termux.
   - Run `x11stop-senestro-ubuntu` in Termux to stop the desktop.
-
-**Step 5 — Connect via VNC Viewer** *(VNC mode only)*
-
-Install [VNC Viewer](https://play.google.com/store/apps/details?id=com.realvnc.viewer.android&hl=en) on your device.
-
-- Open VNC Viewer and tap the **+** button.
-- Enter the address `localhost:1` and assign any name to the connection.
-- Set the picture quality to **High** for the best experience.
-- Tap **Connect** and enter your VNC password when prompted.
 
 ### Quick Reference
 
@@ -91,8 +75,6 @@ Install [VNC Viewer](https://play.google.com/store/apps/details?id=com.realvnc.v
 | `senestro-ubuntu` | Termux | Launch the Ubuntu CLI environment |
 | `x11start-senestro-ubuntu` | Termux | Start the desktop via Termux-X11 |
 | `x11stop-senestro-ubuntu` | Termux | Stop the Termux-X11 desktop session |
-| `vncstart` | Inside Ubuntu | Start the VNC server |
-| `vncstop` | Inside Ubuntu | Stop the VNC server |
 | `bash uninstall.sh` | Termux | Uninstall the Ubuntu environment |
 
 #
