@@ -40,8 +40,9 @@ confirm() {
 }
 
 # -----------------------------------------------------------------------------
-# package: Remove the Ubuntu distro image, its cache, the `ubuntu` launcher,
-# and clean up the PulseAudio sound lines written by install.sh.
+# package: Remove the Ubuntu distro image, its cache, the `senestro-ubuntu`
+# launcher, the x11 scripts, and clean up the PulseAudio sound lines
+# written by install.sh.
 # -----------------------------------------------------------------------------
 package() {
     echo -e "${R} [${W}-${R}]${C} Removing Ubuntu installation and cleaning up..."${W}
@@ -49,8 +50,10 @@ package() {
     # Remove Ubuntu proot image and its cached download
     proot-distro remove ubuntu && proot-distro clear-cache
 
-    # Remove the `ubuntu` shortcut from Termux PATH
-    rm -rf "$PREFIX/bin/ubuntu"
+    # Remove Termux launcher and x11 scripts from Termux PATH
+    rm -f "$PREFIX/bin/senestro-ubuntu"
+    rm -f "$PREFIX/bin/x11start-senestro-ubuntu"
+    rm -f "$PREFIX/bin/x11stop-senestro-ubuntu"
 
     # Remove PulseAudio daemon line from ~/.sound
     sed -i '/pulseaudio --start --exit-idle-time=-1/d' ~/.sound
