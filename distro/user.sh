@@ -63,8 +63,14 @@ login() {
     # Overwrite the Termux `senestro-ubuntu` launcher with a proper proot login command
     # --bind /dev/null:/proc/sys/kernel/cap_last_last  : avoids capability read errors
     # --shared-tmp                                      : share /tmp with Termux
-    # --fix-low-ports                                   : allow binding to ports <1024
-    echo "proot-distro login --user $user ubuntu --bind /dev/null:/proc/sys/kernel/cap_last_last --shared-tmp --fix-low-ports" \
+    # --fix-low-ports                                   : allow binding to ports <1024 (optional, version-dependent)
+    #
+    # Detect whether this proot-distro build supports --fix-low-ports before using it.
+    FIXPORTS_FLAG=""
+    if proot-distro login --help 2>&1 | grep -q 'fix-low-ports'; then
+        FIXPORTS_FLAG="--fix-low-ports"
+    fi
+    echo "proot-distro login --user $user ubuntu --bind /dev/null:/proc/sys/kernel/cap_last_last --shared-tmp $FIXPORTS_FLAG" \
         > /data/data/com.termux/files/usr/bin/senestro-ubuntu
 
     # FIX: make the launcher executable (was commented out in original)

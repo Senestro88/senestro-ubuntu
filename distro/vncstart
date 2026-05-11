@@ -8,6 +8,22 @@
 # apply when a VNC/PulseAudio session is actually starting.
 # =============================================================================
 
+# ── VNC server presence check ─────────────────────────────────────────────
+if ! command -v vncserver &>/dev/null; then
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "  ERROR: vncserver is not installed."
+    echo ""
+    echo "  The GUI has not been set up yet."
+    echo "  Fix — run this inside senestro-ubuntu:"
+    echo "    sudo bash gui.sh"
+    echo ""
+    echo "  Then run vncstart again."
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    exit 1
+fi
+
 export DISPLAY=":1"
 export PULSE_SERVER=127.0.0.1
 

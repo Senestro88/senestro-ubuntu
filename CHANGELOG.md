@@ -1,5 +1,22 @@
 ## Changelog
 
+## [2.1.4] - 11-MAY-2026
+
+### Fixed
+- `install.sh`: `package()` previously skipped all installs if only `pulseaudio` and `proot-distro` were found, silently leaving `termux-x11-nightly` and `qt5-qttools` uninstalled on existing setups. The check now iterates all required packages (`pulseaudio`, `proot-distro`, `termux-x11-nightly`, `qt5-qttools`) and only skips if every one is present. `x11-repo` is also always enabled first so `termux-x11-nightly` is resolvable regardless.
+
+---
+
+## [2.1.3] - 11-MAY-2026
+
+### Fixed
+- `x11start-senestro-ubuntu`: added preflight check for `termux-x11` — exits early with clear install instructions (`pkg install x11-repo && pkg install termux-x11-nightly`) if the binary is missing instead of failing mid-launch with a cryptic error
+- `x11start-senestro-ubuntu`: added preflight check for `startxfce4` inside Ubuntu — exits early with instructions to run `sudo bash gui.sh` if XFCE4 is not installed yet
+- `vncstart`: added preflight check for `vncserver` — exits early with instructions to run `sudo bash gui.sh` instead of crashing with `Couldn't exec vncserver`
+- `user.sh`: `--fix-low-ports` flag in the generated `senestro-ubuntu` launcher is now applied conditionally — detected at runtime via `proot-distro login --help`; silently omitted on older proot-distro builds that do not support it, fixing the `fix-low-ports: inaccessible or not found` error on launch
+
+---
+
 ## [2.1.2] - 11-MAY-2026
 
 ### Changed

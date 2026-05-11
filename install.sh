@@ -47,17 +47,23 @@ package() {
 		echo -e "${R} [${W}-${R}]${C} Requesting storage access..."${W} && \
 		termux-setup-storage
 
-	if [[ $(command -v pulseaudio) && $(command -v proot-distro) ]]; then
-		# Both packages already present — skip install
+	# x11-repo must be enabled before termux-x11-nightly is available
+	yes | pkg install x11-repo
+
+	packs=(pulseaudio proot-distro termux-x11-nightly qt5-qttools)
+
+	# Check whether every required package is already present
+	all_installed=true
+	for x in "${packs[@]}"; do
+		type -p "$x" &>/dev/null || { all_installed=false; break; }
+	done
+
+	if $all_installed; then
 		echo -e "\n${R} [${W}-${R}]${G} Required packages are already installed."${W}
 	else
-		# Upgrade existing packages first, then install missing ones
+		# Upgrade existing packages first, then install any that are missing
 		yes | pkg upgrade
 
-		# x11-repo must be enabled before termux-x11-nightly is available
-		yes | pkg install x11-repo
-
-		packs=(pulseaudio proot-distro termux-x11-nightly qt5-qttools)
 		for x in "${packs[@]}"; do
 			type -p "$x" &>/dev/null || {
 				echo -e "\n${R} [${W}-${R}]${G} Installing package : ${Y}$x${C}"${W}

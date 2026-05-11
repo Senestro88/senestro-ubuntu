@@ -52,6 +52,39 @@ sleep 1
 pactl load-module module-native-protocol-tcp \
     auth-ip-acl=127.0.0.1 auth-anonymous=1 2>/dev/null
 
+# ── Termux-X11 presence check ─────────────────────────────────────────────
+if ! command -v termux-x11 &>/dev/null; then
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "  ERROR: termux-x11 is not installed."
+    echo ""
+    echo "  Fix — run these in Termux:"
+    echo "    pkg install x11-repo"
+    echo "    pkg install termux-x11-nightly"
+    echo ""
+    echo "  Then open the Termux-X11 companion app at least once"
+    echo "  before running this script again."
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    exit 1
+fi
+
+# ── XFCE4 preflight check (inside Ubuntu) ─────────────────────────────────
+if ! proot-distro login ubuntu -- command -v startxfce4 &>/dev/null; then
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "  ERROR: XFCE4 is not installed inside Ubuntu."
+    echo ""
+    echo "  Fix — run these commands:"
+    echo "    senestro-ubuntu"
+    echo "    sudo bash gui.sh"
+    echo ""
+    echo "  Then try x11start-senestro-ubuntu again."
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    exit 1
+fi
+
 # ── Termux-X11 ────────────────────────────────────────────────────────────
 echo "Starting X11 on :${DISPLAY_NUM} ..."
 termux-x11 :${DISPLAY_NUM} -ac &
