@@ -52,8 +52,8 @@ note() {
 	sleep 1
 	cat <<- EOF
 		 ${G}[-] VNC Mode (TigerVNC):
-		 ${G}    Run ${C}vncstart${G} to start the VNC server.
-		 ${G}    Run ${C}vncstop${G} to stop the VNC server.
+		 ${G}    Run ${C}vncstart${G} inside senestro-ubuntu to start the VNC server.
+		 ${G}    Run ${C}vncstop${G} inside senestro-ubuntu to stop the VNC server.
 
 		 ${C}Install VNC Viewer on your Android device.
 
@@ -66,12 +66,12 @@ note() {
 		 ${C}Tap Connect and enter your VNC password when prompted.
 
 		 ${G}[-] Termux-X11 Mode (recommended — lower latency):
-		 ${G}    Exit Ubuntu, then run ${C}x11start${G} in Termux.
-		 ${G}    Run ${C}x11stop${G} in Termux to stop the session.
+		 ${G}    Exit Ubuntu, then run ${C}x11start-senestro-ubuntu${G} in Termux.
+		 ${G}    Run ${C}x11stop-senestro-ubuntu${G} in Termux to stop the session.
 
 		 ${C}Install the Termux-X11 companion app on your Android device.
 
-		 ${C}Run ${C}x11start${G} in Termux, then open the Termux-X11 app to view the desktop.
+		 ${C}Run ${C}x11start-senestro-ubuntu${G} in Termux, then open the Termux-X11 app to view the desktop.
 
 		 ${C}Your Ubuntu GUI is ready to use.${W}
 	EOF
@@ -312,9 +312,9 @@ downloader() {
 # /etc/profile, to avoid PulseAudio warnings on every plain login.
 # -----------------------------------------------------------------------------
 sound_fix() {
-	# Prepend sound startup to the Termux `ubuntu` launcher
-	echo "$(echo "bash ~/.sound" | cat - /data/data/com.termux/files/usr/bin/ubuntu)" \
-		> /data/data/com.termux/files/usr/bin/ubuntu
+	# Prepend sound startup to the Termux `senestro-ubuntu` launcher
+	echo "$(echo "bash ~/.sound" | cat - /data/data/com.termux/files/usr/bin/senestro-ubuntu)" \
+		> /data/data/com.termux/files/usr/bin/senestro-ubuntu
 }
 
 # -----------------------------------------------------------------------------

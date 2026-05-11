@@ -1,5 +1,29 @@
 ## Changelog
 
+## [2.1.1] - 11-MAY-2026
+
+### Added
+- `x11-repo` Termux repository now enabled in `install.sh` before package installs (required for `termux-x11-nightly` to be available)
+- `qt5-qttools` added to Termux package installs (required by Termux-X11)
+- D-Bus machine-id validation and auto-generation in `x11start-senestro-ubuntu` — prevents dbus startup failures inside the proot container
+- Stale session cleanup at startup in `x11start-senestro-ubuntu`: kills old xfce4-session, xfwm4, xfce4-panel, qdbus, pulseaudio, and termux-x11 processes before launching fresh
+- Status banner in `x11start-senestro-ubuntu` showing display number and audio server address
+
+### Changed
+- `x11start-senestro-ubuntu` shebang changed to `/data/data/com.termux/files/usr/bin/bash` (explicit Termux bash path)
+- XFCE4 now launched via `startxfce4` instead of bare `xfce4-session` for a more complete session startup
+- `XDG_RUNTIME_DIR` set to `/tmp/runtime-root` with `chmod 700` inside proot, preventing runtime dir permission warnings
+- PulseAudio TCP module now loaded via `pactl load-module` instead of `pacmd` (more reliable in newer PulseAudio versions)
+- `x11stop-senestro-ubuntu` simplified to direct `pkill` calls — removed fragile `proot-distro login` approach for stopping processes
+- Stale X lock files now cleaned using a `DISPLAY_NUM` variable in `x11start-senestro-ubuntu` for easier display number management
+
+### Fixed
+- `proot-distro login senestro-ubuntu` error — corrected to `proot-distro login ubuntu` in both x11 scripts (`senestro-ubuntu` is the Termux bin launcher name, not the proot-distro registered distro name)
+- `termux-x11: command not found` — fixed invocation and added `-ac` flag
+- PulseAudio "user-configured server, refusing to autospawn" noise — startup now checks if already running and skips gracefully
+
+---
+
 ## [2.1.0] - 11-MAY-2026
 
 ### Added

@@ -1,54 +1,83 @@
-#!/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/bash
 # =============================================================================
 # senestro-ubuntu/distro/x11start-senestro-ubuntu
-# Starts the Ubuntu XFCE4 desktop via Termux-X11 (no VNC needed).
+# Starts the Ubuntu XFCE4 desktop via Termux-X11.
 # Run this in TERMUX (not inside Ubuntu) after `sudo bash gui.sh` completes.
+# Open the Termux-X11 app first, then run this script.
 #
 # Requirements (Termux side):
-#   pkg install termux-x11-nightly pulseaudio
+#   pkg install x11-repo
+#   pkg install termux-x11-nightly pulseaudio qt5-qttools
 # Requirements (Ubuntu side):
 #   xorg-xserver-xephyr  (installed by gui.sh)
-#
-# Usage: x11start-senestro-ubuntu
 # =============================================================================
 
-export DISPLAY=":0"
-export PULSE_SERVER=127.0.0.1
+DISPLAY_NUM=0
 
-# -----------------------------------------------------------------------------
-# Start PulseAudio in Termux if not already running.
-# Loads the Android audio sink and exposes PulseAudio over TCP on localhost
-# so the Ubuntu session can reach it.
-# -----------------------------------------------------------------------------
-if ! pulseaudio --check 2>/dev/null; then
-	echo "[x11start-senestro-ubuntu] Starting PulseAudio..."
-	pulseaudio --start --exit-idle-time=-1
-	pacmd load-module module-aaudio-sink 2>/dev/null
-	pacmd load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1 2>/dev/null
-fi
+echo ""
+echo "Starting Senestro Ubuntu Desktop (Ubuntu + XFCE4)..."
+echo ""
 
-# -----------------------------------------------------------------------------
-# Launch Termux-X11 in the background.
-# termux-x11 opens the X display; the companion Android app renders it.
-# -----------------------------------------------------------------------------
-echo "[x11start-senestro-ubuntu] Starting Termux-X11 on display :0..."
-termux-x11 :0 &
-X11_PID=$!
-
-# Give the X server a moment to initialize before launching the desktop
+# ── Clean up stale sessions ────────────────────────────────────────────────
+echo "Cleaning up old sessions..."
+pkill -f "com.termux.x11" 2>/dev/null
+pkill -f "xfce4-session"  2>/dev/null
+pkill -f "xfwm4"          2>/dev/null
+pkill -f "xfce4-panel"    2>/dev/null
+pkill -f "qdbus"          2>/dev/null
+pkill -f "pulseaudio"     2>/dev/null
 sleep 2
 
-# -----------------------------------------------------------------------------
-# Start XFCE4 session inside the Ubuntu proot container on display :0.
-# --shared-tmp lets the Ubuntu session see the X socket in Termux's /tmp.
-# --fix-low-ports allows binding to privileged ports if needed.
-# -----------------------------------------------------------------------------
-echo "[x11start-senestro-ubuntu] Launching XFCE4 inside Ubuntu..."
-proot-distro login senestro-ubuntu \
-	--shared-tmp \
-	--fix-low-ports \
-	--bind /dev/null:/proc/sys/kernel/cap_last_last \
-	-- env DISPLAY=:0 PULSE_SERVER=127.0.0.1 dbus-launch --exit-with-session xfce4-session &
+# Remove stale X lock/socket files — termux-x11 does not clean these on exit
+rm -f /tmp/.X${DISPLAY_NUM}-lock
+rm -f /tmp/.X11-unix/X${DISPLAY_NUM}
+rmdir /tmp/.X11-unix 2>/dev/null
 
-echo "[x11start-senestro-ubuntu] Desktop started. Open the Termux-X11 app on your device to view it."
-echo "[x11start-senestro-ubuntu] Run x11stop-senestro-ubuntu to end the session."
+# ── Fix D-Bus machine-id BEFORE entering proot ────────────────────────────
+ROOTFS_MACHINEID="$(proot-distro login ubuntu -- cat /etc/machine-id 2>/dev/null)"
+if [ -z "$ROOTFS_MACHINEID" ] || [ ${#ROOTFS_MACHINEID} -ne 32 ]; then
+    echo "Generating D-Bus machine-id..."
+    NEW_UUID="$(cat /proc/sys/kernel/random/uuid 2>/dev/null | tr -d '-')"
+    [ -z "$NEW_UUID" ] && NEW_UUID="$(dd if=/dev/urandom bs=16 count=1 2>/dev/null | od -An -tx1 | tr -d ' \n')"
+    proot-distro login ubuntu -- bash -c \
+        "echo '$NEW_UUID' > /etc/machine-id
+         mkdir -p /var/lib/dbus
+         echo '$NEW_UUID' > /var/lib/dbus/machine-id"
+fi
+
+# ── PulseAudio ────────────────────────────────────────────────────────────
+echo "Starting PulseAudio..."
+pulseaudio --start --exit-idle-time=-1
+sleep 1
+pactl load-module module-native-protocol-tcp \
+    auth-ip-acl=127.0.0.1 auth-anonymous=1 2>/dev/null
+
+# ── Termux-X11 ────────────────────────────────────────────────────────────
+echo "Starting X11 on :${DISPLAY_NUM} ..."
+termux-x11 :${DISPLAY_NUM} -ac &
+sleep 3
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Switch to Termux-X11 app to see the desktop!"
+echo "  Display : :${DISPLAY_NUM}"
+echo "  Audio   : PulseAudio (127.0.0.1)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+# ── Launch XFCE4 inside Ubuntu ────────────────────────────────────────────
+# --shared-tmp is CRITICAL: makes proot share Termux's /tmp so the X11
+# socket created by termux-x11 is visible inside the container.
+# Without it, XFCE4 cannot find the display and shows "already running".
+proot-distro login ubuntu \
+    --shared-tmp \
+    --fix-low-ports \
+    --bind /dev/null:/proc/sys/kernel/cap_last_last \
+    -- env \
+    DISPLAY=:${DISPLAY_NUM} \
+    PULSE_SERVER=127.0.0.1 \
+    XDG_RUNTIME_DIR=/tmp/runtime-root \
+    bash -c \
+    "mkdir -p /tmp/runtime-root && \
+     chmod 700 /tmp/runtime-root && \
+     dbus-launch --exit-with-session startxfce4"

@@ -53,7 +53,11 @@ package() {
 	else
 		# Upgrade existing packages first, then install missing ones
 		yes | pkg upgrade
-		packs=(pulseaudio proot-distro termux-x11-nightly)
+
+		# x11-repo must be enabled before termux-x11-nightly is available
+		yes | pkg install x11-repo
+
+		packs=(pulseaudio proot-distro termux-x11-nightly qt5-qttools)
 		for x in "${packs[@]}"; do
 			type -p "$x" &>/dev/null || {
 				echo -e "\n${R} [${W}-${R}]${G} Installing package : ${Y}$x${C}"${W}

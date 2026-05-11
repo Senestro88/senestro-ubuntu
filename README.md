@@ -3,7 +3,7 @@
 </p>
 <p align="center">
 <img src="https://img.shields.io/badge/MADE%20IN-BANGLADESH-green?colorA=%23ff0000&colorB=%23017e40&style=for-the-badge">
-<img src="https://img.shields.io/badge/Version-2.0-blue?style=for-the-badge">
+<img src="https://img.shields.io/badge/Version-2.1.1-blue?style=for-the-badge">
 </p>
 <p align="center">
 <img src="https://img.shields.io/badge/Written%20In-Bash-darkgreen?style=flat-square">
@@ -62,7 +62,7 @@ Restart Termux again, then run:
    - `senestro-ubuntu`
    - `sudo bash gui.sh`
 
-> **Important:** Make note of the VNC password displayed during this step — it is required to connect later.
+> **Important:** Make note of the VNC password displayed during this step — it is required if you use VNC mode to connect later.
 
 The Ubuntu image is now fully installed.
 
@@ -70,11 +70,12 @@ The Ubuntu image is now fully installed.
   - Run `vncstart` to start the VNC server.
   - Run `vncstop` to stop the VNC server.
 
-**Termux-X11 mode** (run in Termux, lower latency):
-  - Run `x11start-senestro-ubuntu` to start the desktop.
-  - Run `x11stop-senestro-ubuntu` to stop the desktop.
+**Termux-X11 mode** (recommended — lower latency, run in Termux):
+  - Install the [Termux-X11 companion APK](https://github.com/termux/termux-x11/releases) on your device.
+  - Open the Termux-X11 app first, then run `x11start-senestro-ubuntu` in Termux.
+  - Run `x11stop-senestro-ubuntu` in Termux to stop the desktop.
 
-**Step 5 — Connect via VNC Viewer**
+**Step 5 — Connect via VNC Viewer** *(VNC mode only)*
 
 Install [VNC Viewer](https://play.google.com/store/apps/details?id=com.realvnc.viewer.android&hl=en) on your device.
 
